@@ -1,8 +1,97 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /households/{householdId}/{document=**} {
-      allow read, write: if request.auth != null;
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function householdExists(householdId) {
+      return exists(/databases/$(database)/documents/households/$(householdId));
+    }
+
+    function isMember(householdId) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/households/$(householdId)/members/$(request.auth.uid));
+    }
+
+    function isCreator(householdId) {
+      return isSignedIn()
+        && householdExists(householdId)
+        && get(/databases/$(database)/documents/households/$(householdId)).data.createdBy == request.auth.uid;
+    }
+
+    function canAccessHousehold(householdId) {
+      return isMember(householdId) || isCreator(householdId);
+    }
+
+    function isAdmin(householdId) {
+      return isMember(householdId)
+        && get(/databases/$(database)/documents/households/$(householdId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function hasNoHousehold() {
+      return isSignedIn()
+        && (
+          !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.householdId == null
+          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.householdId == ''
+        );
+    }
+
+    match /users/{userId} {
+      allow read, create, update: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /households/{householdId} {
+      allow create: if isSignedIn() && hasNoHousehold();
+      allow read: if canAccessHousehold(householdId);
+
+      match /members/{memberId} {
+        allow read: if canAccessHousehold(householdId)
+          || (isSignedIn() && request.auth.uid == memberId);
+        allow create: if isSignedIn()
+          && request.auth.uid == memberId
+          && hasNoHousehold()
+          && (
+            (
+              request.resource.data.role == 'admin'
+              && householdExists(householdId)
+              && get(/databases/$(database)/documents/households/$(householdId)).data.createdBy == request.auth.uid
+            )
+            || (
+              request.resource.data.role == 'member'
+              && request.resource.data.joinCode is string
+              && request.resource.data.joinCode.size() == 6
+              && exists(/databases/$(database)/documents/households/$(householdId)/invites/$(request.resource.data.joinCode))
+              && get(/databases/$(database)/documents/households/$(householdId)/invites/$(request.resource.data.joinCode)).data.active == true
+            )
+          );
+        allow update: if isAdmin(householdId) || (isSignedIn() && request.auth.uid == memberId);
+      }
+
+      match /invites/{code} {
+        allow read: if isSignedIn() && (canAccessHousehold(householdId) || hasNoHousehold());
+        allow create, update: if isAdmin(householdId);
+      }
+
+      match /tasks/{taskId} {
+        allow read, write: if canAccessHousehold(householdId);
+      }
+
+      match /choreRules/{ruleId} {
+        allow read: if canAccessHousehold(householdId);
+        allow write: if isAdmin(householdId);
+      }
+
+      match /activities/{activityId} {
+        allow read, write: if canAccessHousehold(householdId);
+      }
+
+      match /config/{docId} {
+        allow read: if canAccessHousehold(householdId);
+        allow create: if isCreator(householdId);
+        allow update, delete: if isAdmin(householdId);
+      }
     }
   }
 }

@@ -29,16 +29,17 @@ npm run dev
 
 Firebase project is configured in `src/lib/firebase.ts` for `global-2a5f8`.
 
-Enable:
+Enable in the [Firebase Console](https://console.firebase.google.com/project/global-2a5f8):
 
-1. Authentication → Anonymous
-2. Firestore Database
+1. **Authentication** → **Google** sign-in provider
+2. **Firestore Database**
+3. Add authorized domain: `family-chores-pwa-mvp.web.app`
+4. Disable **Anonymous** auth (no longer used)
 
 Deploy rules:
 
 ```bash
-firebase login
-firebase use global-2a5f8
+firebase login --reauth
 firebase deploy --only firestore:rules
 ```
 

@@ -1,8 +1,31 @@
-import type { ActivityEntry, ChoreRule, Member, RotationConfig, TaskInstance } from "../domain/types";
-import { addDays, generateRecurringTaskInstances, getMonday, toISODate } from "../domain/rules";
-export const HOUSEHOLD_ID="klein-household";
-export const seedMembers:Member[]=[{id:"laurence",name:"Laurence",initials:"L",colorKey:"green",role:"admin",notificationStatus:"ready"},{id:"tom",name:"Tom",initials:"T",colorKey:"blue",role:"member",notificationStatus:"needs_test"},{id:"loretta",name:"Loretta",initials:"L",colorKey:"purple",role:"member",notificationStatus:"needs_install"}];
-export const seedRotation:RotationConfig={cycleLength:3,weeks:{A:{mon:"loretta",tue:"tom",wed:"laurence",thu:"loretta",fri:"tom",sat:"laurence",sun:"loretta"},B:{mon:"tom",tue:"laurence",wed:"loretta",thu:"tom",fri:"laurence",sat:"loretta",sun:"tom"},C:{mon:"laurence",tue:"loretta",wed:"tom",thu:"laurence",fri:"loretta",sat:"tom",sun:"laurence"}}};
-export const seedChoreRules:ChoreRule[]=[{id:"washing_up",name:"Washing up",icon:"🍽️",frequency:"Daily",assignedTo:"tom",day:0,active:true,description:"Dishes done\nSink cleared\nVisible bench wiped"},{id:"kitchen_bench",name:"Kitchen bench",icon:"🧼",frequency:"Daily",assignedTo:"laurence",day:0,active:true,description:"Wipe bench\nClear food scraps\nPut obvious items away"},{id:"mop_kitchen",name:"Mop kitchen",icon:"🧽",frequency:"Weekly",assignedTo:"laurence",day:0,active:true,description:"Sweep first\nMop floor\nPut mop away"},{id:"compost",name:"Compost",icon:"🗑️",frequency:"Weekly",assignedTo:"loretta",day:0,active:true,description:"Empty compost bin\nRinse if needed\nReturn bin"},{id:"microwave",name:"Clean microwave",icon:"▣",frequency:"Weekly",assignedTo:"tom",day:2,active:true,description:"Wipe inside\nWipe outside\nClean turntable"},{id:"air_fryers",name:"Wash both air fryers",icon:"▣",frequency:"Fortnightly",assignedTo:"laurence",day:4,active:true,description:"Wash trays\nWash baskets\nWipe outside"},{id:"shower",name:"Clean shower",icon:"🚿",frequency:"Fortnightly",assignedTo:"laurence",day:5,active:true,description:"Scrub glass, walls and floor\nRemove hair\nRinse soap scum"},{id:"fridge",name:"Clean fridge",icon:"❄️",frequency:"Monthly",assignedTo:"tom",day:6,active:true,description:"Throw old food\nWipe shelves\nOrganise basics"}];
-export function seedTasks(today=new Date()):TaskInstance[]{const startMonday=getMonday(today);const generated=generateRecurringTaskInstances(seedChoreRules,seedRotation,startMonday,6);const now=new Date().toISOString();const oneOffs:TaskInstance[]=[{id:"oneoff_move_boxes",type:"one_off",name:"Move boxes from hallway",icon:"📦",frequency:"One-off",assignedTo:"anyone",dueDate:toISODate(addDays(startMonday,2)),dueTime:"18:00",status:"available",description:"Move boxes into garage\nClear hallway\nStack safely",createdBy:"laurence",weekStart:toISODate(startMonday),createdAt:now,updatedAt:now},{id:"oneoff_bins_back",type:"one_off",name:"Bring bins back in",icon:"🗑️",frequency:"One-off",assignedTo:"tom",dueDate:toISODate(addDays(startMonday,1)),dueTime:"21:00",status:"pending",description:"Bring bins back from street\nPut bins in usual spot\nCheck lids closed",createdBy:"laurence",weekStart:toISODate(startMonday),createdAt:now,updatedAt:now}];return[...generated,...oneOffs];}
-export function seedActivities(today=new Date()):ActivityEntry[]{const weekStart=toISODate(getMonday(today));const now=new Date().toISOString();return[{id:"activity_seed_1",type:"created",text:"Laurence created a one-off task from Dashboard: Move boxes from hallway. Available for anyone.",actorId:"laurence",taskId:"oneoff_move_boxes",weekStart,createdAt:now},{id:"activity_seed_2",type:"system",text:"Daily roster tasks were generated from the rotation template.",actorId:"laurence",weekStart,createdAt:now}]}
+import type { DayKey, RotationConfig, RotationWeekKey } from "../domain/types";
+
+const dayKeys: DayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const weekKeys: RotationWeekKey[] = ["A", "B", "C"];
+
+function weekForMember(memberId: string): Record<DayKey, string> {
+  return Object.fromEntries(dayKeys.map((day) => [day, memberId])) as Record<DayKey, string>;
+}
+
+export function defaultRotationForAdmin(adminId: string): RotationConfig {
+  return {
+    cycleLength: 3,
+    weeks: {
+      A: weekForMember(adminId),
+      B: weekForMember(adminId),
+      C: weekForMember(adminId),
+    },
+  };
+}
+
+export function colorKeyForIndex(index: number): "green" | "blue" | "purple" | "slate" {
+  const keys = ["green", "blue", "purple", "slate"] as const;
+  return keys[index % keys.length];
+}
+
+export function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
