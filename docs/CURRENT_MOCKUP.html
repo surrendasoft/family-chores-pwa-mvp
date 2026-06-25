@@ -1,0 +1,1383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Family Chores PWA — Colour-coded Rotation Mockup v15</title>
+  <style>
+    :root{
+      --bg:#f5f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --line:#e5e7eb;
+      --blue:#2563eb; --blue2:#dbeafe; --green:#16a34a; --green2:#dcfce7;
+      --orange:#ea580c; --orange2:#ffedd5; --red:#dc2626; --red2:#fee2e2;
+      --purple:#7c3aed; --purple2:#ede9fe; --slate:#475569; --slate2:#f1f5f9;
+      --radius:22px; --shadow:0 10px 28px rgba(15,23,42,.07);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(135deg,#eaf3ff,#f8fafc 45%,#f0fdf4);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      padding:24px 10px
+    }
+    .phone{
+      width:100%;
+      max-width:430px;
+      height:910px;
+      max-height:calc(100vh - 48px);
+      border:10px solid #101827;
+      border-radius:46px;
+      overflow:hidden;
+      box-shadow:0 24px 70px rgba(15,23,42,.35);
+      background:var(--bg);
+      position:relative;
+      display:flex;
+      flex-direction:column
+    }
+    .statusbar{
+      height:34px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 22px;
+      font-size:13px;
+      font-weight:800
+    }
+    .topbar{
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      padding:17px 18px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between
+    }
+    h1{margin:0;font-size:25px;letter-spacing:-.045em}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:4px}
+    .avatar{
+      height:44px;
+      width:44px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      background:linear-gradient(135deg,#bfdbfe,#ddd6fe);
+      color:#1e3a8a;
+      border:3px solid #fff;
+      box-shadow:var(--shadow)
+    }
+    .screen{display:none;flex:1;overflow:auto;padding:15px 15px 92px}
+    .screen.active{display:block}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .section-title{margin:17px 0 10px;font-size:15px;font-weight:900;letter-spacing:-.02em}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow:0 6px 20px rgba(15,23,42,.045);
+      margin-bottom:12px
+    }
+    .tap-card{cursor:pointer}
+    .tap-card:active{transform:translateY(1px)}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+    .tiny{font-size:11px}
+    .strong{font-weight:900}
+    .note{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+      padding:12px;
+      border-radius:16px;
+      font-size:13px;
+      font-weight:750;
+      margin-bottom:12px;
+      line-height:1.3
+    }
+    .warning{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+    .info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap
+    }
+    .pending{background:var(--orange2);color:var(--orange)}
+    .done{background:var(--green2);color:var(--green)}
+    .upcoming{background:var(--blue2);color:var(--blue)}
+    .unable{background:var(--red2);color:var(--red)}
+    .swap{background:var(--purple2);color:var(--purple)}
+    .overdue{background:var(--red2);color:var(--red)}
+    .reassigned{background:var(--slate2);color:var(--slate)}
+    .count-pill{
+      min-width:22px;
+      height:22px;
+      border-radius:999px;
+      background:var(--blue2);
+      color:var(--blue);
+      display:inline-grid;
+      place-items:center;
+      font-size:12px;
+      font-weight:900
+    }
+    .task-card{
+      display:grid;
+      grid-template-columns:50px 1fr;
+      gap:12px
+    }
+    .icon{
+      height:44px;
+      width:44px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-size:22px;
+      background:var(--blue2);
+      color:var(--blue);
+      font-weight:900
+    }
+    .icon.g{background:var(--green2);color:var(--green)}
+    .icon.o{background:var(--orange2);color:var(--orange)}
+    .icon.p{background:var(--purple2);color:var(--purple)}
+    .icon.r{background:var(--red2);color:var(--red)}
+    .icon.s{background:var(--slate2);color:var(--slate)}
+    .task-title{font-weight:950;letter-spacing:-.03em;font-size:16px}
+    .task-meta{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.25}
+    .task-def{
+      font-size:12px;
+      color:#475569;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      padding:8px;
+      margin-top:8px
+    }
+    .reason-box{
+      font-size:12px;
+      color:#7c2d12;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      border-radius:12px;
+      padding:8px;
+      margin-top:8px
+    }
+    .actions{
+      grid-column:1/-1;
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:7px;
+      margin-top:10px
+    }
+    button{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:13px;
+      padding:10px 9px;
+      font-weight:900;
+      color:var(--text);
+      font-size:12px;
+      cursor:pointer;
+      font-family:inherit
+    }
+    button:active{transform:translateY(1px)}
+    .primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .good{background:var(--green2);color:var(--green);border-color:#bbf7d0}
+    .bad{background:var(--red2);color:var(--red);border-color:#fecaca}
+    .swap-btn{background:var(--purple2);color:var(--purple);border-color:#ddd6fe}
+    .ghost{background:#f8fafc;color:#334155}
+    .date-nav{
+      display:grid;
+      grid-template-columns:43px 1fr 43px;
+      gap:10px;
+      align-items:center;
+      margin-bottom:12px
+    }
+    .date-nav button{height:43px;padding:0;border-radius:14px;font-size:18px}
+    .date-label{text-align:center;font-weight:950;letter-spacing:-.03em}
+    .segmented{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:6px;
+      background:#e5e7eb;
+      padding:5px;
+      border-radius:16px;
+      margin:8px 0 14px
+    }
+    .segmented.three{grid-template-columns:repeat(3,1fr)}
+    .segmented button{border:0;border-radius:12px;background:transparent;color:var(--muted);padding:9px}
+    .segmented button.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(15,23,42,.08)}
+    .week-chips{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:6px;
+      margin:12px 0 14px
+    }
+    .chip{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:9px 2px;
+      text-align:center;
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted)
+    }
+    .chip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .day-card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      margin-bottom:12px
+    }
+    .day-head{
+      padding:12px 14px;
+      background:#f8fafc;
+      border-bottom:1px solid var(--line);
+      font-weight:950;
+      display:flex;
+      justify-content:space-between;
+      gap:8px
+    }
+    .mini-task{
+      padding:11px 12px;
+      display:grid;
+      grid-template-columns:82px 1fr auto;
+      gap:8px;
+      align-items:center;
+      border-bottom:1px solid var(--line);
+      font-size:12.5px;
+      cursor:pointer
+    }
+    .mini-task:last-child{border-bottom:0}
+    .mini-task:active{background:#f8fafc}
+    .member{display:inline-flex;align-items:center;gap:6px;font-weight:900}
+    .dot{
+      height:27px;
+      width:27px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:12px;
+      font-weight:950;
+      background:#dbeafe;
+      color:#1d4ed8
+    }
+    .dot.lo{background:#ede9fe;color:#7c3aed}
+    .dot.la{background:#dcfce7;color:#16a34a}
+    .activity-item{display:grid;grid-template-columns:44px 1fr;gap:12px;margin-bottom:12px;position:relative}
+    .activity-copy{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:13px;
+      box-shadow:0 6px 18px rgba(15,23,42,.04)
+    }
+    .activity-time{color:var(--muted);font-size:11px;margin-top:6px}
+    .settings-group{margin-bottom:18px}
+    .settings-label{font-size:13px;color:var(--muted);font-weight:900;margin:0 0 8px 2px}
+    .setting-row{
+      display:grid;
+      grid-template-columns:42px 1fr auto;
+      align-items:center;
+      gap:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:9px
+    }
+    .setting-row h3{margin:0;font-size:15px;letter-spacing:-.025em}
+    .setting-row p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+    .rotation-table,.approval-list,.requirements{
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      margin-top:10px
+    }
+    .rotation-row{
+      display:grid;
+      grid-template-columns:56px 1fr 1fr 1fr;
+      border-bottom:1px solid var(--line)
+    }
+    .rotation-row:last-child{border-bottom:0}
+    .rotation-row>div{padding:10px 8px;font-size:12.5px;border-right:1px solid var(--line)}
+    .rotation-row>div:last-child{border-right:0}
+    .rotation-row.head{background:#f8fafc;font-weight:950}
+    .approval-item{padding:12px;border-bottom:1px solid var(--line)}
+    .approval-item:last-child{border-bottom:0}
+    .approval-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+    .req{padding:12px;border-bottom:1px solid var(--line);font-size:12.5px}
+    .req:last-child{border-bottom:0}
+    .req b{display:block;font-size:13px;margin-bottom:3px}
+    .bottom-nav{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      height:76px;
+      background:rgba(255,255,255,.96);
+      border-top:1px solid var(--line);
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      backdrop-filter:blur(12px)
+    }
+    .nav-item{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      cursor:pointer
+    }
+    .nav-item span:first-child{font-size:22px}
+    .nav-item.active{color:var(--blue)}
+    .modal-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,.45);
+      display:none;
+      align-items:flex-end;
+      z-index:20
+    }
+    .modal-backdrop.show{display:flex}
+    .modal{
+      background:#fff;
+      width:100%;
+      border-radius:28px 28px 0 0;
+      padding:19px;
+      box-shadow:0 -18px 50px rgba(15,23,42,.2);
+      max-height:78%;
+      overflow:auto
+    }
+    .modal h2{margin:0 0 6px;font-size:22px;letter-spacing:-.04em}
+    textarea,input,select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:11px;
+      font-family:inherit;
+      font-size:14px;
+      margin-top:8px;
+      background:#fff
+    }
+    textarea{min-height:92px;resize:none}
+    .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+    .detail-actions button{min-height:42px}
+    .full{grid-column:1/-1}
+    .toast{
+      position:absolute;
+      left:18px;
+      right:18px;
+      bottom:90px;
+      background:#111827;
+      color:#fff;
+      padding:13px 15px;
+      border-radius:16px;
+      font-weight:850;
+      font-size:13px;
+      box-shadow:0 12px 30px rgba(15,23,42,.25);
+      z-index:30
+    }
+
+    .avatar{cursor:pointer}
+    .profile-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center}
+    .profile-big{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:950;background:linear-gradient(135deg,#bfdbfe,#ddd6fe);color:#1e3a8a}
+    .admin-panel-title{display:grid;grid-template-columns:43px 1fr;gap:10px;align-items:center;margin-bottom:12px}
+    .admin-panel-title button{height:43px;padding:0;border-radius:14px;font-size:18px}
+    .pill-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+    .time-pill{padding:8px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:900;color:#334155}
+    .switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:10px}
+    .fake-switch{width:46px;height:26px;border-radius:999px;background:var(--blue);position:relative;flex:0 0 auto}
+    .fake-switch:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;right:3px;top:3px}
+
+
+    .cycle-options{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0 12px}
+    .cycle-options button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .cycle-preview{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:10px;margin-top:10px;font-size:12.5px;color:#475569}
+
+
+    .task-checklist{display:grid;gap:6px;margin-top:8px}
+    .check-item{display:flex;gap:8px;align-items:flex-start;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px;color:#475569;line-height:1.25}
+    .check-item span:first-child{color:var(--green);font-weight:900;flex:0 0 auto}
+    .compact-checklist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .compact-point{background:#f8fafc;border:1px solid var(--line);border-radius:999px;padding:6px 9px;font-size:12px;color:#475569}
+
+
+    .description-box{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:9px 11px;margin-top:8px;color:#475569;font-size:13px;line-height:1.35}
+    .description-box ul{margin:6px 0 0 18px;padding:0}
+    .description-box li{margin:3px 0}
+    .description-box .desc-label{font-weight:800;color:#111827;margin-bottom:3px}
+    .description-box .desc-text{white-space:pre-wrap}
+
+
+    .rotation-select{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff;font:inherit;font-size:12.5px;color:var(--text)}
+    .rotation-help{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.35}
+
+
+    .rotation-select.member-loretta{background:#f1edff;border-color:#d7cdfc;color:#5a43c2}
+    .rotation-select.member-tom{background:#eef5ff;border-color:#cfe0ff;color:#2957c8}
+    .rotation-select.member-laurence{background:#ecfaf2;border-color:#cfead8;color:#25734a}
+
+    @media(max-height:720px){
+      body{padding:8px}
+      .phone{height:calc(100vh - 16px);max-height:none}
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● Wi‑Fi ▰</span></div>
+
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div id="pageSubtitle" class="subtitle">Your household week</div>
+      </div>
+      <div class="avatar" onclick="openProfile()">L</div>
+    </header>
+
+    <section id="dashboard" class="screen active">
+      <div class="note info">
+        Dashboard is personal: your tasks this week, available one-off tasks, requests involving you, and recently done items. Daily tasks show the current rotation week.
+      </div>
+
+      <button class="primary" style="width:100%;margin-bottom:12px" onclick="openOneOffTaskCreator()">+ Create one-off task</button>
+
+      <div class="row section-title">
+        <span>Today</span>
+        <span id="dashTodayCount" class="count-pill">0</span>
+      </div>
+      <div id="dashTodayList"></div>
+
+      <div class="row section-title">
+        <span>This week</span>
+        <span id="dashWeekCount" class="count-pill">0</span>
+      </div>
+      <div id="dashWeekList"></div>
+
+      <div class="row section-title">
+        <span>Available one-off tasks</span>
+        <span id="dashAvailableCount" class="count-pill" style="background:var(--blue2);color:var(--blue)">0</span>
+      </div>
+      <div id="dashAvailableList"></div>
+
+      <div class="row section-title">
+        <span>Requests involving you</span>
+        <span id="dashRequestCount" class="count-pill" style="background:var(--purple2);color:var(--purple)">0</span>
+      </div>
+      <div id="dashRequestList"></div>
+
+      <div class="row section-title">
+        <span>Done recently</span>
+        <span id="dashDoneCount" class="count-pill" style="background:var(--green2);color:var(--green)">0</span>
+      </div>
+      <div id="dashDoneList"></div>
+    </section>
+
+    <section id="week" class="screen">
+      <div class="date-nav">
+        <button onclick="moveWeek(-1)">‹</button>
+        <div id="weekLabel" class="date-label">Week</div>
+        <button onclick="moveWeek(1)">›</button>
+      </div>
+
+      <div class="segmented">
+        <button class="active" id="scopeEveryone" onclick="setWeekScope('everyone', this)">Everyone</button>
+        <button id="scopeMe" onclick="setWeekScope('me', this)">Me</button>
+      </div>
+
+      <div id="weekNotice" class="note">Daily roster: Week A · 3-week cycle · Viewing 1 of next 6 weeks</div>
+      <div class="week-chips" id="weekChips"></div>
+      <div id="weekList"></div>
+    </section>
+
+    <section id="activity" class="screen">
+      <div class="note">
+        Activity shows what happened, grouped by week. It is not chat and not another roster.
+      </div>
+
+      <div class="row section-title">
+        <span>Weekly activity</span>
+        <span id="activityLoadedCount" class="count-pill">1</span>
+      </div>
+
+      <div id="activityList"></div>
+
+      <button id="loadActivityButton" class="ghost" style="width:100%;margin-top:6px" onclick="loadOlderActivity()">Load last week</button>
+    </section>
+
+    <section id="profile" class="screen">
+      <div id="profileContent"></div>
+    </section>
+
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-screen="dashboard"><span>⌂</span><span>Dashboard</span></div>
+      <div class="nav-item" data-screen="week"><span>📅</span><span>Week</span></div>
+      <div class="nav-item" data-screen="activity"><span>▤</span><span>Activity</span></div>
+    </nav>
+
+    <div id="reasonModal" class="modal-backdrop">
+      <div class="modal">
+        <h2 id="reasonTitle">Can’t do task</h2>
+        <div id="reasonSub" class="task-meta">Task</div>
+
+        <div id="swapTargetWrap" style="display:none">
+          <label class="small strong">Who do you want to ask?</label>
+          <select id="swapTarget">
+            <option value="anyone">Anyone</option>
+            <option value="tom">Tom</option>
+            <option value="loretta">Loretta</option>
+            <option value="laurence">Laurence</option>
+          </select>
+        </div>
+
+        <label class="small strong" id="reasonLabel">Reason required</label>
+        <textarea id="reasonText" placeholder="Reason required, e.g. I’m working late tonight."></textarea>
+
+        <div class="modal-actions">
+          <button onclick="closeReasonModal()">Cancel</button>
+          <button class="primary" onclick="submitReasonModal()">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="detailModal" class="modal-backdrop">
+      <div class="modal">
+        <div class="row">
+          <div>
+            <h2 id="detailTitle">Task</h2>
+            <div id="detailMeta" class="task-meta">Details</div>
+          </div>
+          <button onclick="closeDetailModal()">×</button>
+        </div>
+
+        <div id="detailStatus" style="margin-top:10px"></div>
+        <div id="detailDef" class="task-def"></div>
+        <div id="detailReason"></div>
+
+        <div class="section-title">Change status</div>
+        <div class="detail-actions">
+          <button class="good" onclick="detailMarkDone()">✓ Mark done</button>
+          <button class="ghost" onclick="detailSetPending()">↺ Set pending</button>
+          <button class="bad" onclick="detailCantDo()">✕ Can’t do</button>
+          <button class="swap-btn" onclick="detailSwap()">↔ Request swap</button>
+          <button class="ghost full" onclick="detailReassignAway()">Admin: reassign away from me</button>
+        </div>
+        <div class="tiny muted" style="margin-top:10px">
+          This lets you smoke-test correction flows before building the backend.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const members = {
+      anyone: { name:"Anyone", initials:"?", dot:"" },
+      tom: { name:"Tom", initials:"T", dot:"" },
+      loretta: { name:"Loretta", initials:"L", dot:"lo" },
+      laurence: { name:"Laurence", initials:"L", dot:"la" }
+    };
+
+    const rotation = {
+      A: { mon:"loretta", tue:"tom", wed:"laurence", thu:"loretta", fri:"tom", sat:"laurence", sun:"loretta" },
+      B: { mon:"tom", tue:"laurence", wed:"loretta", thu:"tom", fri:"laurence", sat:"loretta", sun:"tom" },
+      C: { mon:"laurence", tue:"loretta", wed:"tom", thu:"laurence", fri:"loretta", sat:"tom", sun:"laurence" }
+    };
+
+    let rotationCycleLength = 3;
+
+    const baseTasks = [
+      {id:1, name:"Washing up", icon:"🍽️", frequency:"Daily", person:"tom", day:0, status:"pending", steps:["Dishes done","Sink cleared","Visible bench wiped"]},
+      {id:2, name:"Kitchen bench", icon:"🧼", frequency:"Daily", person:"laurence", day:0, status:"pending", steps:["Wipe bench","Clear food scraps","Put obvious items away"]},
+      {id:3, name:"Mop kitchen", icon:"🧽", frequency:"Weekly", person:"laurence", day:0, status:"pending", steps:["Sweep first","Mop floor","Put mop away"]},
+      {id:4, name:"Compost", icon:"🗑️", frequency:"Weekly", person:"loretta", day:0, status:"done", steps:["Empty compost bin","Rinse if needed","Return bin"]},
+      {id:5, name:"Clean microwave", icon:"▣", frequency:"Weekly", person:"tom", day:2, status:"pending", steps:["Wipe inside","Wipe outside","Clean turntable"]},
+      {id:6, name:"Wash both air fryers", icon:"▣", frequency:"Fortnightly", person:"laurence", day:4, status:"pending", steps:["Wash trays","Wash baskets","Wipe outside"]},
+      {id:7, name:"Clean shower", icon:"🚿", frequency:"Fortnightly", person:"laurence", day:5, status:"upcoming", steps:["Scrub glass, walls and floor","Remove hair","Rinse soap scum"]},
+      {id:8, name:"Clean fridge", icon:"❄️", frequency:"Monthly", person:"tom", day:6, status:"upcoming", steps:["Throw old food","Wipe shelves","Organise basics"]},
+      {id:9, name:"Bins out", icon:"🗑️", frequency:"Weekly", person:"tom", day:1, status:"upcoming", steps:["Check correct bins","Put bins on street","Do before night"]},
+      {id:10, name:"Bathroom sink and toilet", icon:"🚽", frequency:"Weekly", person:"loretta", day:3, status:"pending", steps:["Clean toilet bowl and seat","Wipe sink","Wipe mirror"]},
+      {id:11, name:"Vacuum living room", icon:"▥", frequency:"Weekly", person:"laurence", day:2, status:"done", steps:["Vacuum lounge floor","Vacuum crumbs around couch","Put vacuum away"]},
+      {id:12, name:"Pantry tidy", icon:"▤", frequency:"Monthly", person:"laurence", day:6, status:"reassigned", steps:["Throw expired food","Organise shelves","Wipe obvious spills"], reason:"Admin reassigned this to Tom for this month."},
+      {id:13, name:"Sweep living room", icon:"▥", frequency:"Weekly", person:"laurence", day:3, status:"pending", steps:["Sweep visible floor area","Collect dust","Put dust in bin"]},
+      {id:14, name:"Change bed sheets", icon:"▣", frequency:"Fortnightly", person:"tom", day:5, status:"upcoming", steps:["Strip bed","Put sheets in laundry","Remake bed"]},
+      {id:15, name:"Move boxes from hallway", icon:"📦", frequency:"One-off", type:"one_off", person:"anyone", day:2, dueDate:"2026-06-18", dueTime:"18:00", status:"available", steps:["Move boxes into garage","Clear hallway","Stack safely"], createdBy:"laurence"},
+      {id:16, name:"Bring bins back in", icon:"🗑️", frequency:"One-off", type:"one_off", person:"tom", day:1, dueDate:"2026-06-17", dueTime:"21:00", status:"pending", steps:["Bring bins back from street","Put bins in usual spot","Check lids closed"], createdBy:"laurence"},
+      {id:17, name:"Find blue folder", icon:"📁", frequency:"One-off", type:"one_off", person:"loretta", day:4, dueDate:"2026-06-20", status:"pending", steps:["Check front room shelves","Look for blue folder","Tell household if found"], createdBy:"tom"}
+    ];
+
+    let tasks = [...baseTasks];
+
+    let approvals = [
+      {id:101, name:"Oven deep clean", frequency:"Monthly", by:"Tom", def:"Remove trays, wipe grease, clean glass."},
+      {id:102, name:"Dust fans and vents", frequency:"Monthly", by:"Loretta", def:"Dust visible fans, vents and hard-to-reach dusty areas."}
+    ];
+
+    let activityWeeks = [
+      {
+        label:"This week",
+        loaded:true,
+        items:[
+          {type:"done", icon:"✓", cls:"g", text:"Laurence marked Vacuum living room as done.", time:"Today · 8:40am"},
+          {type:"done", icon:"✓", cls:"g", text:"Loretta marked Compost as done.", time:"Today · 8:15am"},
+          {type:"issues", icon:"!", cls:"o", text:"Kitchen bench is still pending for Laurence.", time:"Today · 12:00pm"},
+          {type:"system", icon:"📌", cls:"", text:"Laurence created a one-off task from Dashboard: Move boxes from hallway. Available for anyone.", time:"Today · 10:10am"}
+        ]
+      },
+      {
+        label:"Last week",
+        loaded:false,
+        items:[
+          {type:"issues", icon:"↔", cls:"p", text:"Tom requested a swap for Bins out. Reason: working late.", time:"12 Jun · 6:20pm"},
+          {type:"done", icon:"✓", cls:"g", text:"Loretta marked Clean microwave as done.", time:"10 Jun · 9:05am"}
+        ]
+      },
+      {
+        label:"Week of 2–8 Jun",
+        loaded:false,
+        items:[
+          {type:"system", icon:"i", cls:"", text:"Week C tasks were generated from the 3-week daily roster template.", time:"2 Jun · 12:01am"},
+          {type:"done", icon:"✓", cls:"g", text:"Tom marked Washing up as done.", time:"2 Jun · 8:55pm"}
+        ]
+      }
+    ];
+
+    let weekOffset = 0;
+    let loadedActivityWeeks = 1;
+    let weekScope = "everyone";
+    let selectedTaskId = null;
+    let pendingReasonAction = null;
+    let adminMode = true;
+    let adminPanel = "home";
+
+    const currentUser = "laurence";
+    const baseMonday = new Date(2026, 5, 16);
+    function toISODate(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,"0");
+      const d = String(date.getDate()).padStart(2,"0");
+      return `${y}-${m}-${d}`;
+    }
+    function parseLocalDate(iso){
+      if(!iso) return new Date(baseMonday);
+      const [y,m,d] = iso.split("-").map(Number);
+      return new Date(y, m-1, d);
+    }
+    function daysBetween(start, end){
+      const a = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const b = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      return Math.round((b-a)/86400000);
+    }
+    const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    const dayShort = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    const dayKeys = ["mon","tue","wed","thu","fri","sat","sun"];
+    function activeCycleKeys(){ return ["A","B","C"].slice(0, rotationCycleLength); }
+    function cycleWeekForOffset(offset=0){ const keys = activeCycleKeys(); return keys[offset % keys.length]; }
+    function cycleLabelForOffset(offset=0){ return `Week ${cycleWeekForOffset(offset)}`; }
+    function getAssignedPerson(t, offset=0){
+      if(t.frequency === "Daily"){
+        const cycle = cycleWeekForOffset(offset);
+        const key = dayKeys[t.day];
+        return rotation[cycle]?.[key] || t.person;
+      }
+      return t.person;
+    }
+    function rotationCycleDescription(){
+      return rotationCycleLength === 1 ? "1-week cycle" : rotationCycleLength === 2 ? "2-week cycle" : "3-week cycle";
+    }
+    const monthShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const titles = {
+      dashboard:["Dashboard","Your household week"],
+      week:["Week","Roster and planning"],
+      activity:["Activity","Weekly history"],
+      profile:["Profile","Account and admin"]
+    };
+
+    function showScreen(target){
+      document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+      document.getElementById(target).classList.add("active");
+      document.querySelectorAll(".nav-item").forEach(n=>n.classList.toggle("active", n.dataset.screen === target));
+      document.getElementById("pageTitle").textContent = titles[target]?.[0] || "Profile";
+      document.getElementById("pageSubtitle").textContent = titles[target]?.[1] || "Account and admin";
+      if(target === "profile") renderProfile();
+    }
+
+    document.querySelectorAll(".nav-item").forEach(item=>{
+      item.onclick=()=> showScreen(item.dataset.screen);
+    });
+
+    function openProfile(){
+      adminPanel = "home";
+      showScreen("profile");
+    }
+
+    function addDays(date, days){ const d=new Date(date); d.setDate(d.getDate()+days); return d; }
+    function fmtDayMonth(date){ return `${date.getDate()} ${monthShort[date.getMonth()]}`; }
+    function fmtDayMonthYear(date){ return `${date.getDate()} ${monthShort[date.getMonth()]} ${date.getFullYear()}`; }
+    function fmtWeekRange(startDate){
+      const endDate=addDays(startDate,6);
+      if(startDate.getMonth()===endDate.getMonth() && startDate.getFullYear()===endDate.getFullYear()) {
+        return `${startDate.getDate()}–${endDate.getDate()} ${monthShort[startDate.getMonth()]} ${startDate.getFullYear()}`;
+      }
+      if(startDate.getFullYear()===endDate.getFullYear()) {
+        return `${startDate.getDate()} ${monthShort[startDate.getMonth()]} – ${endDate.getDate()} ${monthShort[endDate.getMonth()]} ${startDate.getFullYear()}`;
+      }
+      return `${fmtDayMonthYear(startDate)} – ${fmtDayMonthYear(endDate)}`;
+    }
+
+    function labelForStatus(s){
+      return s==="done"?"Done":s==="unable"?"Can’t do":s==="swap_requested"?"Swap requested":s==="overdue"?"Overdue":s==="upcoming"?"Upcoming":s==="available"?"Available":s==="reassigned"?"Reassigned":"Pending";
+    }
+    function clsForStatus(s){
+      return s==="done"?"done":s==="unable"?"unable":s==="swap_requested"?"swap":s==="overdue"?"overdue":s==="upcoming"?"upcoming":s==="available"?"upcoming":s==="reassigned"?"reassigned":"pending";
+    }
+    function iconClass(t){
+      return t.status==="done"?"g":t.status==="unable"?"r":t.status==="swap_requested"?"p":t.status==="reassigned"?"s":t.frequency==="Fortnightly"?"p":t.frequency==="Monthly"?"s":"o";
+    }
+    function memberName(id){ return members[id]?.name || id; }
+    function memberDot(id){ const m=members[id]; return `<span class="member"><span class="dot ${m.dot}">${m.initials}</span>${m.name}</span>`; }
+    function isOpen(t){ return ["swap_requested","unable","overdue"].includes(t.status); }
+    function isDone(t){ return ["done","reassigned"].includes(t.status); }
+    function isAvailable(t){ return t.type === "one_off" && t.status === "available"; }
+    function dueDateForTask(t, offset=0){
+      if(t.type === "one_off" && t.dueDate) return parseLocalDate(t.dueDate);
+      return addDays(addDays(baseMonday, offset*7), t.day);
+    }
+    function taskDayIndexForWeek(t, offset=0){
+      const weekStart = addDays(baseMonday, offset*7);
+      return daysBetween(weekStart, dueDateForTask(t, offset));
+    }
+    function taskMatchesWeekDay(t, dayIndex, offset=0){
+      return taskDayIndexForWeek(t, offset) === dayIndex;
+    }
+    function taskDateLabel(t, offset=0){
+      const dueDate = dueDateForTask(t, offset);
+      const dayIndex = (dueDate.getDay()+6)%7;
+      const cycle = t.frequency === "Daily" ? ` · ${cycleLabelForOffset(offset)} (${rotationCycleDescription()})` : "";
+      const time = t.dueTime ? ` · due ${t.dueTime}` : "";
+      return `${dayNames[dayIndex]} ${fmtDayMonth(dueDate)}${time}${cycle}`;
+    }
+    function descriptionLines(t){
+      if(t.description) return t.description.split("\n").map(s=>s.trim()).filter(Boolean);
+      if(Array.isArray(t.steps) && t.steps.length) return t.steps;
+      if(t.def) return t.def.split(/,|\./).map(s=>s.trim()).filter(Boolean);
+      return [];
+    }
+    function descriptionBoxHtml(t, compact=false){
+      const lines = descriptionLines(t);
+      if(!lines.length) return `<div class="description-box"><div class="desc-label">Description</div><div class="desc-text">No description added.</div></div>`;
+      const shown = compact ? lines.slice(0,3) : lines;
+      const more = compact && lines.length > 3 ? `<li>+${lines.length-3} more</li>` : "";
+      return `<div class="description-box"><div class="desc-label">Description / checklist</div><ul>${shown.map(s=>`<li>${s}</li>`).join("")}${more}</ul></div>`;
+    }
+
+    function taskCard(t, showPerson=false, offset=0){
+      const normalActions = !["done","unable","swap_requested","reassigned","available"].includes(t.status);
+      const reason = t.reason ? `<div class="reason-box">Reason/history: ${t.reason}</div>` : "";
+      const assignedPerson = getAssignedPerson(t, offset);
+      const person = showPerson ? ` · ${memberName(assignedPerson)}` : "";
+      const actions = isAvailable(t) ? `
+        <div class="actions">
+          <button class="primary" onclick="event.stopPropagation(); claimTask(${t.id})">Take task</button>
+          <button class="ghost" onclick="event.stopPropagation(); openDetail(${t.id})">View details</button>
+          <button class="ghost" onclick="event.stopPropagation(); toast('In production this could notify the creator.')">Ask about it</button>
+        </div>` : normalActions ? `
+        <div class="actions">
+          <button class="good" onclick="event.stopPropagation(); markDone(${t.id})">✓ Done</button>
+          <button class="bad" onclick="event.stopPropagation(); openReasonModal(${t.id}, 'unable')">✕ Can’t do</button>
+          <button class="swap-btn" onclick="event.stopPropagation(); openReasonModal(${t.id}, 'swap')">↔ Swap</button>
+        </div>` : `
+        <div class="actions">
+          <button class="ghost" onclick="event.stopPropagation(); openDetail(${t.id})">Edit status</button>
+          <button class="good" onclick="event.stopPropagation(); markDone(${t.id})">✓ Done now</button>
+          <button class="ghost" onclick="event.stopPropagation(); setPending(${t.id})">↺ Pending</button>
+        </div>`;
+
+      return `<article class="card task-card tap-card" onclick="openDetail(${t.id})">
+        <div class="icon ${iconClass(t)}">${t.icon}</div>
+        <div>
+          <div class="row">
+            <div>
+              <div class="task-title">${t.name}</div>
+              <div class="task-meta">${t.frequency}${person} · ${taskDateLabel(t, offset)}</div>
+            </div>
+            <span class="badge ${clsForStatus(t.status)}">${labelForStatus(t.status)}</span>
+          </div>
+          ${t.frequency === "Daily" ? `<div class="task-def">Daily roster cycle: ${cycleLabelForOffset(offset)}. This follows the selected ${rotationCycleDescription()}.</div>` : t.type === "one_off" ? `<div class="task-def">One-off task. Created by ${memberName(t.createdBy || "laurence")}. ${isAvailable(t) ? "Available for anyone to take." : "Assigned to " + memberName(assignedPerson) + "."}</div>` : ""}
+          ${descriptionBoxHtml(t, true)}
+          ${reason}
+        </div>
+        ${actions}
+      </article>`;
+    }
+
+
+    function profileShell(inner){
+      return `<div class="card profile-card">
+        <div class="profile-big">L</div>
+        <div>
+          <div class="task-title">Laurence</div>
+          <div class="task-meta">laurence@example.com · ${adminMode ? "Admin view" : "Member view"}</div>
+          <div style="margin-top:7px"><span class="badge ${adminMode ? "done" : "upcoming"}">${adminMode ? "Admin" : "Member"}</span></div>
+        </div>
+      </div>
+
+      <div class="segmented">
+        <button class="${adminMode ? "active" : ""}" onclick="setRoleView(true)">Admin view</button>
+        <button class="${!adminMode ? "active" : ""}" onclick="setRoleView(false)">Member view</button>
+      </div>
+
+      ${inner}`;
+    }
+
+    function renderProfile(){
+      const el = document.getElementById("profileContent");
+      if(!el) return;
+      document.getElementById("pageTitle").textContent = adminPanel === "home" ? "Profile" : panelTitle(adminPanel);
+      document.getElementById("pageSubtitle").textContent = adminMode ? "Account and admin" : "Account";
+
+      if(adminPanel !== "home"){
+        el.innerHTML = profileShell(renderAdminPanel(adminPanel));
+        renderApprovals();
+        renderRotation();
+        return;
+      }
+
+      const memberContent = `<div class="settings-group">
+        <div class="settings-label">Account</div>
+        <div class="setting-row"><div class="icon g">✓</div><div><h3>Notification status</h3><p>Installed · notifications enabled · test received</p></div><span class="badge done">Ready</span></div>
+        <div class="setting-row"><div class="icon">👥</div><div><h3>Household</h3><p>Klein household · Loretta, Tom, Laurence</p></div><span>›</span></div>
+        <div class="setting-row"><div class="icon r">↩</div><div><h3>Sign out</h3><p>Leave this device signed out</p></div><span>›</span></div>
+      </div>`;
+
+      const adminContent = adminMode ? `<div class="settings-group">
+        <div class="settings-label">Admin controls · recurring system</div>
+        <div class="setting-row" onclick="openAdminPanel('members')"><div class="icon">👥</div><div><h3>Members & devices</h3><p>Invite people and check notification setup</p></div><span>›</span></div>
+        <div class="setting-row" onclick="openAdminPanel('chores')"><div class="icon p">▣</div><div><h3>Chores & approvals</h3><p>Manage recurring chores and definitions of done</p></div><span>›</span></div>
+        <div class="setting-row" onclick="openAdminPanel('reminders')"><div class="icon">🔔</div><div><h3>Reminder rules</h3><p>Daily rotation, weekly, fortnightly and monthly reminders</p></div><span>›</span></div>
+        <div class="setting-row" onclick="openAdminPanel('rotation')"><div class="icon g">⟳</div><div><h3>Rotation template</h3><p>1–3 week daily roster</p></div><span>›</span></div>
+        <div class="setting-row" onclick="openAdminPanel('system')"><div class="icon o">📅</div><div><h3>System actions</h3><p>Generate next 6 weeks and view MVP rules</p></div><span>›</span></div>
+      </div>` : `<div class="note info">Member view hides recurring task controls. Members can still create one-off tasks from Dashboard.</div>`;
+
+      el.innerHTML = profileShell(memberContent + adminContent);
+    }
+
+    function setRoleView(isAdmin){
+      adminMode = isAdmin;
+      adminPanel = "home";
+      renderProfile();
+      toast(isAdmin ? "Viewing admin UI." : "Viewing member UI.");
+    }
+
+    function openAdminPanel(panel){
+      adminPanel = panel;
+      renderProfile();
+    }
+
+    function openOneOffTaskCreator(){
+      adminPanel = "oneoff";
+      showScreen("profile");
+    }
+
+    function backToProfileHome(){
+      adminPanel = "home";
+      renderProfile();
+    }
+
+    function panelTitle(panel){
+      return panel === "reminders" ? "Reminder rules" : panel === "members" ? "Members" : panel === "chores" ? "Chores" : panel === "rotation" ? "Rotation" : panel === "oneoff" ? "One-off task" : "System";
+    }
+
+    function renderAdminPanel(panel){
+      const header = `<div class="admin-panel-title"><button onclick="backToProfileHome()">‹</button><div class="date-label">${panelTitle(panel)}</div></div>`;
+
+      if(panel === "oneoff"){
+        return `${header}
+          <div class="note info">Any member can create a one-off task. It does not repeat and uses one due date from a calendar picker, with optional due time.</div>
+          <div class="card">
+            <label class="small strong">Task name</label>
+            <input id="newOneOffName" placeholder="e.g. Move boxes from hallway" />
+            <label class="small strong">Assign to</label>
+            <select id="newOneOffAssignee">
+              <option value="anyone">Anyone can take it</option>
+              <option value="tom">Tom</option>
+              <option value="loretta">Loretta</option>
+              <option value="laurence">Laurence</option>
+            </select>
+            <label class="small strong">Due date</label>
+            <input id="newOneOffDueDate" type="date" value="${toISODate(baseMonday)}" min="${toISODate(baseMonday)}" />
+            <div class="small muted">Tap to open the calendar picker and choose the exact date it is due.</div>
+            <label class="small strong">Due time optional</label>
+            <input id="newOneOffTime" type="time" />
+            <label class="small strong">Description / checklist</label>
+            <textarea id="newOneOffDef" placeholder="Write plain notes, or one checklist point per line, e.g.\nMove boxes into garage\nClear hallway\nStack safely"></textarea>
+            <button class="primary" style="width:100%;margin-top:10px" onclick="createOneOffTask()">Create one-off task</button>
+          </div>
+          <div class="settings-label">Current one-off tasks</div>
+          <div class="requirements">${oneOffSummaryHtml()}</div>`;
+      }
+
+      if(panel === "reminders"){
+        return `${header}
+          <div class="note warning">Reminder rules are admin-controlled so members cannot weaken the accountability system.</div>
+          <div class="card"><div class="row"><div><div class="task-title">Daily roster chores</div><div class="task-meta">Use the selected 1–3 week rotation</div></div><span class="badge pending">Until done</span></div><div class="pill-row"><span class="time-pill">8:00am</span><span class="time-pill">12:00pm</span><span class="time-pill">5:00pm</span><span class="time-pill">8:00pm</span></div></div>
+          <div class="card"><div class="task-title">Weekly chores</div><div class="task-meta">Remind across the week until done</div><div class="pill-row"><span class="time-pill">Mon</span><span class="time-pill">Wed</span><span class="time-pill">Fri</span><span class="time-pill">Sun 8pm</span></div></div>
+          <div class="card"><div class="task-title">Fortnightly chores</div><div class="task-meta">For shower, air fryers and heavier hygiene chores</div><div class="pill-row"><span class="time-pill">Day 1</span><span class="time-pill">Day 5</span><span class="time-pill">Day 10</span><span class="time-pill">Day 14</span></div></div>
+          <div class="card"><div class="task-title">Monthly chores</div><div class="task-meta">Deep-clean / maintenance only</div><div class="pill-row"><span class="time-pill">Start</span><span class="time-pill">Middle</span><span class="time-pill">End</span></div></div>
+          <div class="switch-row"><div><b>Escalate if still pending</b><div class="small muted">Show as overdue after cutoff</div></div><div class="fake-switch"></div></div>
+          <button class="primary" style="width:100%;margin-top:12px" onclick="toast('Reminder settings saved in mockup.')">Save reminder rules</button>`;
+      }
+
+      if(panel === "members"){
+        return `${header}
+          <div class="note info">Use this to confirm each person can receive push notifications before relying on reminders.</div>
+          <div class="setting-row"><div class="icon g">✓</div><div><h3>Laurence</h3><p>Admin · Installed · Notifications enabled · Test received</p></div><span class="badge done">Ready</span></div>
+          <div class="setting-row"><div class="icon o">!</div><div><h3>Tom</h3><p>Member · Signed in · Needs notification test</p></div><button onclick="fakeTest('Tom')">Test</button></div>
+          <div class="setting-row"><div class="icon o">!</div><div><h3>Loretta</h3><p>Member · Needs Home Screen install</p></div><button onclick="fakeTest('Loretta')">Test</button></div>
+          <button class="primary" style="width:100%;margin-top:8px" onclick="toast('Invite link copied in mockup.')">Copy household invite link</button>`;
+      }
+
+      if(panel === "chores"){
+        return `${header}
+          <div class="card">
+            <label class="small strong">Chore name</label>
+            <input id="newChoreName" placeholder="e.g. Clean shower" />
+            <label class="small strong">Frequency</label>
+            <select id="newChoreFreq"><option value="daily">Daily — use rotation roster</option><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option><option value="monthly">Monthly</option></select>
+            <label class="small strong">Definition of done</label>
+            <textarea id="newChoreDef" placeholder="What counts as done?"></textarea>
+            <button class="primary" style="width:100%;margin-top:10px" onclick="proposeChore()">Propose chore</button>
+          </div>
+          <div class="settings-label">Pending approvals</div>
+          <div id="approvalList" class="approval-list"></div>`;
+      }
+
+      if(panel === "rotation"){
+        return `${header}
+          <div class="note">Choose a 1, 2 or 3-week daily roster cycle, then assign each day to a member. The app repeats this template across the generated 6-week view.</div>
+          <div class="card">
+            <div class="task-title">Daily rotation length</div>
+            <div class="task-meta">Current: ${rotationCycleDescription()}</div>
+            <div class="cycle-options">
+              <button class="${rotationCycleLength === 1 ? "active" : ""}" onclick="setRotationCycleLength(1)">1 week</button>
+              <button class="${rotationCycleLength === 2 ? "active" : ""}" onclick="setRotationCycleLength(2)">2 weeks</button>
+              <button class="${rotationCycleLength === 3 ? "active" : ""}" onclick="setRotationCycleLength(3)">3 weeks</button>
+            </div>
+            <div class="cycle-preview"><b>6-week preview:</b> ${sixWeekCyclePreview()}</div>
+          </div>
+          <div class="rotation-table" id="rotationTable"></div>
+          <div class="rotation-help">Tap each cell to choose who is assigned. Each dropdown is colour-coded to match the member colours. Changes affect the rotation template; swaps still only affect individual task instances.</div>
+          <button class="primary" style="width:100%;margin-top:12px" onclick="saveRotationTemplate()">Save rotation template</button>`;
+      }
+
+      return `${header}
+        <div class="card"><div class="task-title">Generate next 6 weeks</div><div class="task-meta">Creates task instances from the current chore rules and rotation template.</div><button class="primary" style="width:100%;margin-top:12px" onclick="generateWeeks()">Generate next 6 weeks</button></div>
+        <div class="requirements">
+          <div class="req"><b>Dashboard</b>Personal action view only.</div>
+          <div class="req"><b>Week</b>Planning view with Everyone / Me toggle and visible Week A/B/C cycle.</div>
+          <div class="req"><b>Activity</b>Weekly audit trail with lazy-loaded older weeks.</div>
+          <div class="req"><b>One-off tasks</b>Any member can create a single task from Dashboard, assign it, set a due date, and add a flexible description/checklist.</div>
+          <div class="req"><b>Admin</b>Recurring chore management lives inside Profile for admin only, not the bottom nav.</div>
+        </div>`;
+    }
+
+    function renderDashboard(){
+      const personal = tasks.filter(t => getAssignedPerson(t, 0) === currentUser || isOpen(t) || t.status === "reassigned");
+      const today = personal.filter(t => taskMatchesWeekDay(t, 0, 0) && !isOpen(t) && !isDone(t) && !isAvailable(t));
+      const thisWeek = personal.filter(t => {
+        const dayIndex = taskDayIndexForWeek(t, 0);
+        return dayIndex > 0 && dayIndex < 7 && !isOpen(t) && !isDone(t) && !isAvailable(t);
+      });
+      const available = tasks.filter(t => isAvailable(t));
+      const requests = personal.filter(t => isOpen(t));
+      const done = personal.filter(t => isDone(t));
+
+      document.getElementById("dashTodayList").innerHTML = today.length ? today.map(t=>taskCard(t)).join("") : `<div class="card muted small">Nothing due today.</div>`;
+      document.getElementById("dashWeekList").innerHTML = thisWeek.length ? thisWeek.map(t=>taskCard(t)).join("") : `<div class="card muted small">No other tasks this week.</div>`;
+      document.getElementById("dashAvailableList").innerHTML = available.length ? available.map(t=>taskCard(t, true)).join("") : `<div class="card muted small">No available one-off tasks.</div>`;
+      document.getElementById("dashRequestList").innerHTML = requests.length ? requests.map(t=>taskCard(t, true)).join("") : `<div class="card muted small">No open requests involving you.</div>`;
+      document.getElementById("dashDoneList").innerHTML = done.length ? done.map(t=>taskCard(t)).join("") : `<div class="card muted small">Nothing done recently.</div>`;
+
+      document.getElementById("dashTodayCount").textContent = today.length;
+      document.getElementById("dashWeekCount").textContent = thisWeek.length;
+      document.getElementById("dashAvailableCount").textContent = available.length;
+      document.getElementById("dashRequestCount").textContent = requests.length;
+      document.getElementById("dashDoneCount").textContent = done.length;
+    }
+
+    function renderWeek(){
+      const rotationWeek = cycleWeekForOffset(weekOffset);
+      const weekStart = addDays(baseMonday, weekOffset * 7);
+      document.getElementById("weekLabel").textContent = `Week of ${fmtWeekRange(weekStart)}`;
+      document.getElementById("weekNotice").textContent =
+        `Daily roster: Week ${rotationWeek} · ${rotationCycleDescription()} · ${weekScope === "everyone" ? "Everyone’s roster" : "Your roster"} · Viewing ${weekOffset+1} of next 6 weeks`;
+
+      document.getElementById("weekChips").innerHTML = dayShort.map((d,i)=>{
+        const chipDate = addDays(weekStart, i);
+        return `<div class="chip ${i===0?"active":""}">${d}<br>${fmtDayMonth(chipDate)}</div>`;
+      }).join("");
+
+      const scoped = weekScope === "me" ? tasks.filter(t => getAssignedPerson(t, weekOffset) === currentUser || isOpen(t) || isAvailable(t)) : tasks;
+      let html = "";
+      for(let i=0; i<7; i++){
+        const dayDate = addDays(weekStart, i);
+        const dayTasks = scoped.filter(t => taskMatchesWeekDay(t, i, weekOffset));
+        html += `<div class="day-card">
+          <div class="day-head"><span>${dayNames[i]} ${fmtDayMonth(dayDate)}</span><span>${dayTasks.length} tasks</span></div>
+          ${dayTasks.map(t=>`<div class="mini-task" onclick="openDetail(${t.id})">${memberDot(getAssignedPerson(t, weekOffset))}<span>${t.name}${t.frequency === "Daily" ? ` <span class="tiny muted">· Week ${rotationWeek}</span>` : ""}</span><span class="badge ${clsForStatus(t.status)}">${labelForStatus(t.status)}</span></div>`).join("") || `<div class="mini-task"><span></span><span class="muted">No tasks</span><span></span></div>`}
+        </div>`;
+      }
+      document.getElementById("weekList").innerHTML = html;
+    }
+
+    function renderActivity(){
+      const loaded = activityWeeks.slice(0, loadedActivityWeeks);
+      let html = "";
+
+      loaded.forEach((week, index)=>{
+        html += `<div class="section-title">${week.label}</div>`;
+        html += week.items.map(f=>`<div class="activity-item">
+          <div class="icon ${f.cls}">${f.icon}</div>
+          <div class="activity-copy"><strong>${f.text}</strong><div class="activity-time">${f.time}</div></div>
+        </div>`).join("");
+      });
+
+      document.getElementById("activityList").innerHTML = html || `<div class="card muted small">No activity yet.</div>`;
+      document.getElementById("activityLoadedCount").textContent = loadedActivityWeeks;
+
+      const btn = document.getElementById("loadActivityButton");
+      if (loadedActivityWeeks >= activityWeeks.length) {
+        btn.textContent = "No older activity";
+        btn.disabled = true;
+      } else if (loadedActivityWeeks === 1) {
+        btn.textContent = "Load last week";
+        btn.disabled = false;
+      } else {
+        btn.textContent = "Load older";
+        btn.disabled = false;
+      }
+    }
+
+    function renderApprovals(){
+      const approvalEl = document.getElementById("approvalList");
+      if(!approvalEl) return;
+      approvalEl.innerHTML = approvals.length ? approvals.map(a=>`<div class="approval-item">
+        <div class="row"><div><b>${a.name}</b><div class="small muted">${a.frequency} · proposed by ${a.by}</div></div><span class="badge pending">Pending</span></div>
+        <div class="task-def">${a.def}</div>
+        <div class="approval-actions"><button class="good" onclick="approve(${a.id})">Approve</button><button class="bad" onclick="reject(${a.id})">Reject</button></div>
+      </div>`).join("") : `<div class="approval-item muted small">No pending approvals.</div>`;
+    }
+
+    function memberSelectClass(memberId){
+      return memberId === "loretta" ? "member-loretta" : memberId === "tom" ? "member-tom" : "member-laurence";
+    }
+
+    function rotationMemberOptions(selected){
+      return ["loretta","tom","laurence"].map(id=>`<option value="${id}" ${selected===id?"selected":""}>${memberName(id)}</option>`).join("");
+    }
+
+    function updateRotationCell(weekKey, dayKey, value){
+      rotation[weekKey][dayKey] = value;
+      renderProfile();
+      renderWeek();
+      renderDashboard();
+      toast(`Updated Week ${weekKey} ${dayKey.toUpperCase()} to ${memberName(value)}.`);
+    }
+
+    function renderRotation(){
+      const rows=["mon","tue","wed","thu","fri","sat","sun"];
+      const rotationEl = document.getElementById("rotationTable");
+      if(!rotationEl) return;
+      const keys = activeCycleKeys();
+      rotationEl.innerHTML =
+        `<div class="rotation-row head" style="grid-template-columns:56px repeat(${keys.length}, 1fr)"><div>Day</div>${keys.map(k=>`<div>Week ${k}</div>`).join("")}</div>` +
+        rows.map((r,i)=>`<div class="rotation-row" style="grid-template-columns:56px repeat(${keys.length}, 1fr)">
+          <div>${dayShort[i]}</div>
+          ${keys.map(k=>`<div><select class="rotation-select ${memberSelectClass(rotation[k][r])}" onchange="updateRotationCell('${k}','${r}',this.value)">${rotationMemberOptions(rotation[k][r])}</select></div>`).join("")}
+        </div>`).join("");
+    }
+
+    function sixWeekCyclePreview(){
+      return Array.from({length:6}, (_,i)=>`Week ${i+1}: ${cycleLabelForOffset(i)}`).join(" · ");
+    }
+
+    function setRotationCycleLength(length){
+      rotationCycleLength = length;
+      renderProfile();
+      renderWeek();
+      renderDashboard();
+      toast(`Rotation changed to ${rotationCycleDescription()} in mockup.`);
+    }
+
+    function saveRotationTemplate(){
+      addActivity("system", `Admin saved the ${rotationCycleDescription()} daily roster template assignments.`, "✓", "g");
+      renderProfile();
+      renderWeek();
+      renderDashboard();
+    }
+
+    function refresh(){
+      renderDashboard();
+      renderWeek();
+      renderActivity();
+      renderApprovals();
+      renderRotation();
+      if(document.getElementById("profile")?.classList.contains("active")) renderProfile();
+    }
+
+    function addActivity(type, text, icon="i", cls=""){
+      activityWeeks[0].items.unshift({type, icon, cls, text, time:"Just now"});
+      renderActivity();
+      toast(text);
+    }
+
+    
+    function oneOffSummaryHtml(){
+      const oneOffs = tasks.filter(t => t.type === "one_off");
+      if(!oneOffs.length) return `<div class="req">No one-off tasks yet.</div>`;
+      return oneOffs.map(t=>`<div class="req"><b>${t.name}</b>${labelForStatus(t.status)} · ${memberName(t.person)} · ${taskDateLabel(t, weekOffset)}</div>`).join("");
+    }
+
+    function createOneOffTask(){
+      const name = document.getElementById("newOneOffName")?.value.trim();
+      const assignee = document.getElementById("newOneOffAssignee")?.value || "anyone";
+      const dueDate = document.getElementById("newOneOffDueDate")?.value || toISODate(baseMonday);
+      const due = parseLocalDate(dueDate);
+      const day = (due.getDay()+6)%7;
+      const dueTime = document.getElementById("newOneOffTime")?.value || "";
+      const description = document.getElementById("newOneOffDef")?.value.trim();
+
+      if(!name || !description){
+        alert("Task name and description / checklist are required.");
+        return;
+      }
+
+      const task = {
+        id: Date.now(),
+        name,
+        icon: "📌",
+        frequency: "One-off",
+        type: "one_off",
+        person: assignee,
+        day,
+        dueDate,
+        dueTime,
+        status: assignee === "anyone" ? "available" : "pending",
+        description,
+        createdBy: currentUser
+      };
+
+      tasks.push(task);
+      addActivity("system", `${memberName(currentUser)} created one-off task: ${name}. ${assignee === "anyone" ? "Available for anyone." : "Assigned to " + memberName(assignee) + "."}`, "📌", "");
+      renderProfile();
+      refresh();
+    }
+
+    function claimTask(id){
+      const t = tasks.find(x=>x.id===id);
+      if(!t || !isAvailable(t)) return;
+      t.person = currentUser;
+      t.status = "pending";
+      t.reason = "";
+      addActivity("system", `${memberName(currentUser)} took one-off task: ${t.name}.`, "✓", "g");
+      refresh();
+    }
+
+function markDone(id){
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+      t.status = "done";
+      t.reason = "";
+      addActivity("done", `${memberName(getAssignedPerson(t, weekOffset))} marked ${t.name} as done.`, "✓", "g");
+      refresh();
+    }
+
+    function setPending(id){
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+      t.status = "pending";
+      t.reason = "";
+      addActivity("issues", `${t.name} was set back to pending.`, "↺", "o");
+      refresh();
+    }
+
+    function openReasonModal(id, action){
+      selectedTaskId = id;
+      pendingReasonAction = action;
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+
+      document.getElementById("reasonTitle").textContent = action === "swap" ? "Request swap" : "Can’t do task";
+      document.getElementById("reasonSub").textContent = `${t.name} · ${memberName(getAssignedPerson(t, weekOffset))}`;
+      document.getElementById("reasonLabel").textContent = action === "swap" ? "Why do you need to swap?" : "Why can’t you do this?";
+      document.getElementById("reasonText").placeholder = action === "swap" ? "Reason required, e.g. I’m out tonight or I have work." : "Reason required, e.g. I’m sick or working late.";
+      document.getElementById("reasonText").value = "";
+      document.getElementById("swapTargetWrap").style.display = action === "swap" ? "block" : "none";
+      document.getElementById("reasonModal").classList.add("show");
+    }
+
+    function submitReasonModal(){
+      const reason = document.getElementById("reasonText").value.trim();
+      if(!reason){
+        alert("Reason is required.");
+        return;
+      }
+
+      const t = tasks.find(x=>x.id===selectedTaskId);
+      if(!t) return;
+
+      if(pendingReasonAction === "swap"){
+        const target = document.getElementById("swapTarget").value;
+        t.status = "swap_requested";
+        t.reason = `Asked ${target === "anyone" ? "anyone" : memberName(target)}. ${reason}`;
+        addActivity("issues", `${memberName(getAssignedPerson(t, weekOffset))} requested a swap for ${t.name}. Reason: ${reason}`, "↔", "p");
+      } else {
+        t.status = "unable";
+        t.reason = reason;
+        addActivity("issues", `${memberName(getAssignedPerson(t, weekOffset))} can’t do ${t.name}. Reason: ${reason}`, "!", "o");
+      }
+
+      closeReasonModal();
+      refresh();
+    }
+
+    function closeReasonModal(){
+      document.getElementById("reasonModal").classList.remove("show");
+    }
+
+    function openDetail(id){
+      selectedTaskId = id;
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+
+      document.getElementById("detailTitle").textContent = t.name;
+      document.getElementById("detailMeta").textContent = `${t.frequency} · Assigned to ${memberName(getAssignedPerson(t, weekOffset))} · ${taskDateLabel(t, weekOffset)}`;
+      document.getElementById("detailStatus").innerHTML = `<span class="badge ${clsForStatus(t.status)}">${labelForStatus(t.status)}</span>`;
+      document.getElementById("detailDef").innerHTML = descriptionBoxHtml(t, false);
+      document.getElementById("detailReason").innerHTML = (t.reason ? `<div class="reason-box">Reason/history: ${t.reason}</div>` : "") + (isAvailable(t) ? `<div class="reason-box">This one-off task is unclaimed. Anyone can take it.</div>` : "");
+      document.getElementById("detailModal").classList.add("show");
+    }
+
+    function closeDetailModal(){
+      document.getElementById("detailModal").classList.remove("show");
+    }
+
+    function detailMarkDone(){ closeDetailModal(); markDone(selectedTaskId); }
+    function detailSetPending(){ closeDetailModal(); setPending(selectedTaskId); }
+    function detailCantDo(){ closeDetailModal(); openReasonModal(selectedTaskId, "unable"); }
+    function detailSwap(){ closeDetailModal(); openReasonModal(selectedTaskId, "swap"); }
+
+    function detailReassignAway(){
+      const t = tasks.find(x=>x.id===selectedTaskId);
+      if(!t) return;
+      t.status = "reassigned";
+      t.reason = "Admin reassigned this task away from the original person.";
+      closeDetailModal();
+      addActivity("system", `${t.name} was reassigned by admin.`, "i", "s");
+      refresh();
+    }
+
+    function moveWeek(delta){
+      weekOffset = Math.max(0, Math.min(5, weekOffset + delta));
+      renderWeek();
+    }
+
+    function setWeekScope(scope, btn){
+      weekScope = scope;
+      btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      renderWeek();
+    }
+
+    function loadOlderActivity(){
+      if (loadedActivityWeeks < activityWeeks.length) {
+        loadedActivityWeeks += 1;
+        renderActivity();
+        toast(loadedActivityWeeks === 2 ? "Loaded last week." : "Loaded older activity.");
+      }
+    }
+
+    function approve(id){
+      const a = approvals.find(x=>x.id===id);
+      if(!a) return;
+      approvals = approvals.filter(x=>x.id!==id);
+      tasks.push({
+        id:Date.now(),
+        name:a.name,
+        icon:"▣",
+        frequency:a.frequency,
+        person:"laurence",
+        day:3,
+        status:"upcoming",
+        def:a.def
+      });
+      addActivity("system", `${a.name} approved and added as an active chore.`, "✓", "g");
+      refresh();
+    }
+
+    function reject(id){
+      const a = approvals.find(x=>x.id===id);
+      if(!a) return;
+      approvals = approvals.filter(x=>x.id!==id);
+      addActivity("system", `${a.name} rejected from chore proposals.`, "x", "r");
+      renderApprovals();
+    }
+
+    function proposeChore(){
+      const name = document.getElementById("newChoreName").value.trim();
+      const freq = document.getElementById("newChoreFreq").value;
+      const def = document.getElementById("newChoreDef").value.trim();
+
+      if(!name || !def){
+        alert("Chore name and definition of done are required.");
+        return;
+      }
+
+      const label = freq.charAt(0).toUpperCase() + freq.slice(1);
+      approvals.push({id:Date.now(), name, frequency:label, by:"Laurence", def});
+
+      document.getElementById("newChoreName").value = "";
+      document.getElementById("newChoreDef").value = "";
+
+      addActivity("system", `${name} proposed for admin approval.`, "i", "");
+      renderApprovals();
+    }
+
+    function fakeTest(name){
+      toast(`Test notification sent to ${name}. In the real app this must be confirmed on-device.`);
+    }
+
+    function generateWeeks(){
+      addActivity("system", "Generated task instances for the next rolling 6 weeks.", "📅", "");
+    }
+
+    function toast(msg){
+      const old = document.querySelector(".toast");
+      if(old) old.remove();
+
+      const div = document.createElement("div");
+      div.className = "toast";
+      div.textContent = msg;
+
+      document.querySelector(".phone").appendChild(div);
+      setTimeout(()=>div.remove(),2500);
+    }
+
+    refresh();
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules
+dist
+.firebase
+.env
+.env.local
+.DS_Store
+coverage
+firebase-debug.log
+tsconfig.tsbuildinfo

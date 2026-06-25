@@ -1,0 +1,1 @@
+import { ensureSeedData } from "../src/services/firestore"; ensureSeedData().then(()=>{console.log("Seed data ensured.");process.exit(0)}).catch(err=>{console.error(err);process.exit(1)});
