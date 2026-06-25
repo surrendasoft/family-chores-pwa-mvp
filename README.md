@@ -56,23 +56,32 @@ npm run build
 
 ## Deploy hosting
 
-### GitHub Pages (recommended)
+This app deploys to a **dedicated Firebase Hosting site** inside project `global-2a5f8`:
 
-Live URL: **https://surrendasoft.github.io/family-chores-pwa-mvp/**
+- **https://family-chores-pwa-mvp.web.app**
+- **https://family-chores-pwa-mvp.firebaseapp.com**
 
-Pushes to `master` deploy automatically via GitHub Actions.
+That is separate from the default `global-2a5f8.web.app` URL.
 
-Local build for Pages preview:
-
-```bash
-npm run deploy:pages
-```
-
-### Firebase Hosting (optional)
+### One-time setup
 
 ```bash
 firebase login --reauth
+firebase hosting:sites:create family-chores-pwa-mvp --project global-2a5f8
+```
+
+If the site already exists, skip the create step.
+
+### Deploy
+
+```bash
 npm run deploy
+```
+
+To also deploy Firestore rules:
+
+```bash
+npm run deploy:all
 ```
 
 Real scheduled push reminders are not included in MVP 1. Add Firebase Cloud Messaging + Cloud Functions later.
